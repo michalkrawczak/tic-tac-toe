@@ -15,6 +15,7 @@ const App: React.FC = () => {
     const [board, setBoard] = useState<Board>([['', '', ''], ['', '', ''], ['', '', '']]);
     const [winner, setWinner] = useState<string | null>(null);
     const [currentPlayer, setCurrentPlayer] = useState<string>("X");
+    const [mode, setMode] = useState<string>("random");
 
     const fetchBoard = async () => {
         const response = await fetch(`${API_URL}/board`);
@@ -66,6 +67,19 @@ const App: React.FC = () => {
             </div>
             {winner && <h2>{winner === "Draw" ? "It's a Draw!" : `Player ${winner} Wins!`}</h2>}
             <button onClick={resetGame}>Reset</button>
+            <button
+                onClick={async () => {
+                    await fetch(`${API_URL}/mode/toggle`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ mode: mode === "random" ? "optimal" : "random" }),
+                    });
+                    setMode(mode === "random" ? "optimal" : "random");
+                    fetchBoard();
+                }}>Toggle mode</button>
+            <div> Current mode: {
+                mode === "random" ? "Random" : "Optimal"
+            } </div>
         </div>
     );
 };
